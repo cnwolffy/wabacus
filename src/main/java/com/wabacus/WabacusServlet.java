@@ -18,22 +18,6 @@
  */
 package com.wabacus;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.wabacus.config.Config;
 import com.wabacus.config.ConfigLoadManager;
 import com.wabacus.config.database.datasource.AbsDataSource;
@@ -44,6 +28,21 @@ import com.wabacus.system.task.TimingThread;
 import com.wabacus.util.Consts;
 import com.wabacus.util.Tools;
 import com.wabacus.util.WabacusClassLoader;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class WabacusServlet extends HttpServlet implements ServletContextListener
 {
@@ -54,8 +53,10 @@ public class WabacusServlet extends HttpServlet implements ServletContextListene
     public void contextInitialized(ServletContextEvent event)
     {
         closeAllDatasources();
-        Config.homeAbsPath=event.getServletContext().getRealPath("/");
-        Config.homeAbsPath=FilePathAssistant.getInstance().standardFilePath(Config.homeAbsPath+"\\");
+        if(StringUtils.isBlank(Config.homeAbsPath)) {
+            Config.homeAbsPath = event.getServletContext().getRealPath("/");
+            Config.homeAbsPath = FilePathAssistant.getInstance().standardFilePath(Config.homeAbsPath + "\\");
+        }
         /*try
         {
             Config.webroot=event.getServletContext().getContextPath();

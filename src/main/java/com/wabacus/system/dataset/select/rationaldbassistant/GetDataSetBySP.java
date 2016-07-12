@@ -18,15 +18,6 @@
  */
 package com.wabacus.system.dataset.select.rationaldbassistant;
 
-import java.sql.CallableStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import oracle.jdbc.driver.OracleTypes;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.wabacus.config.Config;
 import com.wabacus.config.component.application.report.ConditionBean;
 import com.wabacus.config.component.application.report.ReportBean;
@@ -39,6 +30,13 @@ import com.wabacus.system.dataset.select.common.SPCommonDataSetValueProvider;
 import com.wabacus.system.datatype.IDataType;
 import com.wabacus.system.datatype.VarcharType;
 import com.wabacus.util.Tools;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import java.sql.CallableStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 
 public class GetDataSetBySP
 {
@@ -105,7 +103,7 @@ public class GetDataSetBySP
             }
             if(dbtype instanceof Oracle)
             {
-                cstmt.registerOutParameter(idx,OracleTypes.CURSOR);
+                cstmt.registerOutParameter(idx, Types.STRUCT);
             }
             rrequest.addUsedStatement(cstmt);
             cstmt.executeQuery();
