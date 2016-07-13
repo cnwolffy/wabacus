@@ -4,7 +4,7 @@
 					xsi:schemaLocation="http://www.wabacus.com xsd/wabacus.cfg.xsd">
 	<system>	
 		<item name="webroot" value="/"/><!-- 应用的根URL -->
-		<item name="version" value="4.3"/><!-- 版本号 -->
+		<item name="version" value="4.3.1"/><!-- 版本号 -->
 		<item name="js-create" value="true"/><!--是否关闭自动生成javascript功能，如果关闭，则加载配置文件时不再生成js文件，可以将在其它地方生成好的拷到指定位置，如果不关闭，则每次加载报表配置文件时，都会生成一份javascript文件。默认为打开状态。建议开发环境打开这个功能-->
 		<item name="default-preparedstatement-sql" value="true"/><!--当通过SQL语句生成报表时，这个属性是指定采用preparedstatement方式执行，还是采用statement方式执行,默认为后者。-->
 		<item name="default-report-sqlconvertlevel" value="complete"/><!-- 默认为报表配置的SQL语句是原始SQL语句还是最终SQL语句 -->
