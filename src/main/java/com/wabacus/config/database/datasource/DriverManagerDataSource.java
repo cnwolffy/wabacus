@@ -18,19 +18,16 @@
  */
 package com.wabacus.config.database.datasource;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.util.List;
-
-import javax.sql.DataSource;
-
+import com.wabacus.exception.WabacusConfigLoadingException;
+import com.wabacus.exception.WabacusRuntimeException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Element;
 
-import com.wabacus.exception.WabacusConfigLoadingException;
-import com.wabacus.exception.WabacusRuntimeException;
-import com.wabacus.util.DesEncryptTools;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.List;
 
 public class DriverManagerDataSource extends AbsDataSource
 {
@@ -138,16 +135,7 @@ public class DriverManagerDataSource extends AbsDataSource
         driver=driver==null?"":driver.trim();
         url=url==null?"":url.trim();
         user=user==null?"":user.trim();
-        password=password==null?"":password.trim();
-        if(password.startsWith("{3DES}"))
-        {
-            password=password.substring("{3DES}".length());
-            if(DesEncryptTools.KEY_OBJ==null)
-            {
-                throw new WabacusConfigLoadingException("没有取到密钥文件，无法完成数据库密码解密操作");
-            }
-            password=DesEncryptTools.decrypt(password);
-        }
+        password=decryptPassword(password);
         if(driver.equals("")||url.equals("")||user.equals(""))
         {
             throw new WabacusConfigLoadingException("数据源："+this.getName()+"配置的参数不完整，必须配置driver,url,user几个参数");

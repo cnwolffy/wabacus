@@ -18,78 +18,76 @@
  */
 package com.wabacus.config.database.datasource;
 
-import java.sql.Connection;
-
-import javax.sql.DataSource;
-
-import org.dom4j.Element;
-
 import com.wabacus.config.ConfigLoadManager;
 import com.wabacus.config.database.type.AbsDatabaseType;
 import com.wabacus.exception.WabacusConfigLoadingException;
+import com.wabacus.util.DesEncryptTools;
+import org.dom4j.Element;
 
-public abstract class AbsDataSource
-{
-    private String name;
+import javax.sql.DataSource;
+import java.sql.Connection;
 
-    private AbsDatabaseType dbType;
+public abstract class AbsDataSource {
+	private String name;
 
-    public String getName()
-    {
-        return name;
-    }
+	private AbsDatabaseType dbType;
 
-    public void setName(String name)
-    {
-        this.name=name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public AbsDatabaseType getDbType()
-    {
-        return dbType;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setDbType(AbsDatabaseType dbType)
-    {
-        this.dbType=dbType;
-    }
-    
-    public void closePool()
-    {
-    }
-    
-    public  void loadConfig(Element eleDataSource)
-    {
-        String dbtype=eleDataSource.attributeValue("dbtype");
-        if(dbtype==null||dbtype.trim().equals(""))
-        {
-            throw new WabacusConfigLoadingException("必须配置数据源的dbtype属性");
-        }
-        Class c;
-        try
-        {
-            c=ConfigLoadManager.currentDynClassLoader.loadClassByCurrentLoader(dbtype.trim());
-        }catch(Exception e)
-        {
-            throw new WabacusConfigLoadingException("配置的dbtype："+dbtype+"，无法加载此类",e);
-        }
-        Object o;
-        try
-        {
-            o=c.newInstance();
-        }catch(Exception e)
-        {
-            throw new WabacusConfigLoadingException("配置的dbtype："+dbtype+"，无法实例化此类的对象",e);
-        }
-        if(!(o instanceof AbsDatabaseType))
-        {
-            throw new WabacusConfigLoadingException("配置的dbtype："+dbtype+"对应的类没有继承"
-                    +AbsDatabaseType.class.getName()+"超类");
-        }
-        this.dbType=(AbsDatabaseType)o;
-    }
-    
-    public abstract Connection getConnection();
-    
-    public abstract DataSource getDataSource();
+	public AbsDatabaseType getDbType() {
+		return dbType;
+	}
+
+	public void setDbType(AbsDatabaseType dbType) {
+		this.dbType = dbType;
+	}
+
+	public void closePool() {
+	}
+
+	public void loadConfig(Element eleDataSource) {
+		String dbtype = eleDataSource.attributeValue("dbtype");
+		if (dbtype == null || dbtype.trim().equals("")) {
+			throw new WabacusConfigLoadingException("必须配置数据源的dbtype属性");
+		}
+		Class c;
+		try {
+			c = ConfigLoadManager.currentDynClassLoader.loadClassByCurrentLoader(dbtype.trim());
+		} catch (Exception e) {
+			throw new WabacusConfigLoadingException("配置的dbtype：" + dbtype + "，无法加载此类", e);
+		}
+		Object o;
+		try {
+			o = c.newInstance();
+		} catch (Exception e) {
+			throw new WabacusConfigLoadingException("配置的dbtype：" + dbtype + "，无法实例化此类的对象", e);
+		}
+		if (!(o instanceof AbsDatabaseType)) {
+			throw new WabacusConfigLoadingException("配置的dbtype：" + dbtype + "对应的类没有继承"
+													+ AbsDatabaseType.class.getName() + "超类");
+		}
+		this.dbType = (AbsDatabaseType) o;
+	}
+
+	public abstract Connection getConnection();
+
+	public abstract DataSource getDataSource();
+
+	protected String decryptPassword(String password) {
+		password = password == null ? "" : password.trim();
+		if (password.startsWith("{3DES}")) {
+			password = password.substring("{3DES}".length());
+			if (DesEncryptTools.KEY_OBJ == null) {
+				throw new WabacusConfigLoadingException("没有取到密钥文件，无法完成数据库密码解密操作");
+			}
+			password = DesEncryptTools.decrypt(password);
+		}
+		return password;
+	}
 }

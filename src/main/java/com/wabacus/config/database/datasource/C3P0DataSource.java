@@ -18,22 +18,19 @@
  */
 package com.wabacus.config.database.datasource;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.dom4j.Element;
-
 import com.mchange.v2.c3p0.DataSources;
 import com.mchange.v2.c3p0.PoolConfig;
 import com.wabacus.exception.WabacusConfigLoadingException;
 import com.wabacus.exception.WabacusRuntimeException;
-import com.wabacus.util.DesEncryptTools;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.dom4j.Element;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Properties;
 
 public class C3P0DataSource extends AbsDataSource
 {
@@ -156,16 +153,7 @@ public class C3P0DataSource extends AbsDataSource
         pcfg.setIdleConnectionTestPeriod(idleTestPeriod);
 
         Properties connectionProps=new Properties();
-        password=password==null?"":password.trim();
-        if(password.startsWith("{3DES}"))
-        {
-            password=password.substring("{3DES}".length());
-            if(DesEncryptTools.KEY_OBJ==null)
-            {
-                throw new WabacusConfigLoadingException("没有取到密钥文件，无法完成数据库密码解密操作");
-            }
-            password=DesEncryptTools.decrypt(password);
-        }
+        password=decryptPassword(password);
         connectionProps.setProperty("user",user);
         connectionProps.setProperty("password",password);
         try
